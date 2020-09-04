@@ -2,7 +2,7 @@
 //************************************//
 //    Perfusion Chamber Generator     //
 //    Ian Kinstlinger, MillerLab      //
-//    Updated 4/16/2020               //
+//    Updated 9/2/2020               //
 //************************************//
 //************************************//
 
@@ -13,9 +13,10 @@
 GelLength = 19; //mm
 //The script will automatically make the chamber 2mm longer than the gel to give clearance for catheters and repositioning
 GelWidth = 9; //mm
-GelHeight = 5; //mm
+GelHeight = 10; //mm
 
-nameText = "HelloWorld";
+nameText1 = "Hello World";
+nameText2 = "Chamber Body";
 // Optionally add engraved text to label your model
 // **Make sure the name is short enough to fit on the chamber**
 // There is no coded length limit because the limit depends on chamber size
@@ -25,9 +26,9 @@ nameText = "HelloWorld";
 //What component to generate? Only one should be enabled at a time!
 ////////////////////////////////////////
 
-GenerateBody = 0;
+GenerateBody = 1;
 GenerateGasketMold = 0;
-GenerateLid = 1;
+GenerateLid = 0;
 
 //ONLY turn one on at a time
 
@@ -36,13 +37,13 @@ GenerateLid = 1;
 ///////////////////////////////////////////////
 
 Fins = 0 ; //To mount in a vertical holder
-SolidBottom = 1; //Choose no (0) if you need to image through the bottom!
-PDMSTraps = 0; //To add features to help with PDMS adhesion for glass slides
+SolidBottom = 0; //Choose no (0) if you need to image through the bottom!
+PDMSTraps = 1; //To add features to help with PDMS adhesion for glass slides
 //NOTES: if making a solid bottom, PDMS traps should be off (no glass to adhere)
 // Currently PDMS traps are not supported if extra screws are used
 NeedlePDMS = 1; //Add empty space to create a PDMS gasket for your catheter tips
 ExtraScrews = 0;
-ExternalGelPorts =  1; //Add extra catheter ports on sides to allow media perfusion through external space on top of gel 
+ExternalGelPorts =  0; //Add extra catheter ports on sides to allow media perfusion through external space on top of gel 
 
 
 //*************************************
@@ -58,8 +59,8 @@ NeedleGauge = 18; //Must be 15, 18, or 20!
 TroughWidth = 2; //How wide is the trough which holds the PDMS gasket?
 TroughDepth = 1; //How deep is the trough which holds the PDMS gasket?
 
-xScrewOffset = 7.5; //Spacing screws along gel long side
-yScrewOffset = 4; //Spacing screws along gel short side
+xScrewOffset = 8.5; //Spacing screws along gel long side
+yScrewOffset = 3; //Spacing screws along gel short side
 
 GasketHeight = 1.5;
 LidHeight = 2.5; //mm
@@ -86,24 +87,10 @@ ExternalPortNeedleGauge = NeedleGauge; //Change if different gauge tips are used
 HullCylRad = 7; //This controls the filleted corner curvature
 SlideWidth = 25; //Standard microscope slide is 25mm
 
-TroughWidth = 2; //How wide is the trough which holds the PDMS gasket?
-TroughDepth = 1; //How deep is the trough which holds the PDMS gasket?
-
-xScrewOffset = 7.5; //Spacing screws along gel long side
-yScrewOffset = 4; //Spacing screws along gel short side
-
-GasketHeight = 1.5;
-LidHeight = 2.5; //mm
-
 textSize = 3;
 
 screwNutTolerance = 0.3;
 lidTolerance = 0.25;
-
-
-
-
-
 
 
 //********************************
@@ -126,7 +113,6 @@ if (GenerateGasketMold == 1){
 
 module chamber(){
 
-
 difference(){
    
 union(){
@@ -135,7 +121,6 @@ filletCorners();
 if(Fins == 1){
     fins();
 }
-
     
 }
 
@@ -179,7 +164,6 @@ if(PDMSTraps == 1){
 if(NeedlePDMS == 1){
     NeedlePDMS();
     mirror([1,0,0]){NeedlePDMS();};
-
 }
 
 //Holes for screws and traps for nuts
@@ -326,11 +310,7 @@ module booleanMediaPorts(){
 
 
 module PDMSTrap(){
-    //translate([xScrewOffset+GelExtLength/2,yScrewOffset+SlideWidth/5,2-GelHeight/2]) cylinder(r = 2, h = 2, center = true);
-    //translate([xScrewOffset/1.5+GelExtLength/20,.5+yScrewOffset+SlideWidth/2,2-GelHeight/2]) cylinder(r = 2, h = 2, center = true);
-    //translate([xScrewOffset+GelExtLength/2,yScrewOffset+SlideWidth/5,.5-GelHeight/2]) cylinder(r = 1, h = 1, center = true);
-    //translate([xScrewOffset/1.5+GelExtLength/20,.5+yScrewOffset+SlideWidth/2,.5-GelHeight/2]) cylinder(r = 1, h = 1, center = true);
-    
+   
     translate([0,GelWidth+yScrewOffset/2,1.5-GelHeight/2]) cube([GelExtLength+6,5,1.5], center = true);
     //Subsurface expanded trap to prevent leaks
     
@@ -359,17 +339,17 @@ module NeedlePDMS(){
     
     if(GelHeight < 6){
     
-    translate([GelExtLength/2+5,0,-.3-SolidBottom]) cube([1.5,5,GelHeight-.3+SolidBottom], center = true);
+    translate([GelExtLength/2+5,0,-.3]) cube([1.5,5,GelHeight-.3], center = true);
     //Main cavity for PDMS casting
     }
     
     if(GelHeight >= 6){
      
-    translate([GelExtLength/2+3,0,-2-SolidBottom]) cube([2.5,6,GelHeight-2+SolidBottom], center = true);
+    translate([GelExtLength/2+5,0,-2]) cube([1.5,6,GelHeight-2], center = true);
     //Main cavity for PDMS casting
     
      
-    translate([GelExtLength/2+3,0,0]) cube([4,8,3], center = true);
+    translate([GelExtLength/2+5,0,0]) cube([4,8,3], center = true);
     //Sub-surface expanded trap to prevent leaks
     }
     
@@ -474,13 +454,18 @@ module fins(){
 
 
 module labelText(){
-   translate([4-xScrewOffset-GelExtLength/2, -2-yScrewOffset-SlideWidth/2, GelHeight+ChamberHeightOffset/2-1]){
+   translate([4-xScrewOffset-GelExtLength/2, -2-yScrewOffset-SlideWidth/2, GelHeight/2-1+ChamberHeightOffset]){
        linear_extrude(1){
-           text(nameText, size = textSize, center = true);
+           text(nameText2, size = textSize, font=       "Helvetica:style=Bold");
        }
    }
-   
+   translate([4-xScrewOffset-GelExtLength/2, -2+yScrewOffset+SlideWidth/2, GelHeight/2-1+ChamberHeightOffset]){
+       linear_extrude(1){
+           text(nameText1, size = textSize, font=       "Helvetica:style=Bold");
+       }
+   }
 } 
+
 
 //
 
