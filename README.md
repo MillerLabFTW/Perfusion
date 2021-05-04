@@ -4,7 +4,7 @@
 ### [millerlab.rice.edu](http://millerlab.rice.edu)
 ### Project developed by Ian Kinstlinger; revised 04/2020
 
-
+Please check back soon for more details about this project.
 
 
 
